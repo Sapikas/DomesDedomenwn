@@ -1,102 +1,69 @@
-import java.io.File;
-import java.io.IOException;
 import java.util.Scanner;
-
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FilterReader;
+import java.io.IOException;
+import java.io.Reader;
 public class Greedy {
-	public static void main(String[] args) throws IOException {
+	int pros;
+	int tasks;
+	int counter=0;
+	int Makespan=0;
+	Processor tempP;
+	PQInterface pq = new MaxPQ();
+	String s;
+	DataList<Task> x;
+	Greedy(DataList<Task> x,int pros,int tasks) throws FileNotFoundException{
+		this.x =x;
+		this.pros = pros;
+		this.tasks=tasks;
+		}
 		
-		File file = new File("E:\\ssd_m2\\Desktop\\Ergasia2_Domes.txt");
-		Scanner input = new Scanner(file);
-		Processor temp;
-		int count = 0;
-		PQInterface pq = new MaxPQ();
-		ListOfNodes<Processor> lon = new ListOfNodes<Processor>();
-		ListOfNodes<Processor> new_lon = new ListOfNodes<Processor>();
-	  	Processor min = null;
-	  	int min1 = 0;
-	  	Task temp1 = null;
-	  	Processor temp2 = null;
-	  	int z = 1;
-	  	int numOfProc = 0;
-		while (input.hasNext()) {
-		      String word  = input.next();
-		      int word1 = Integer.parseInt(word);
-		      count++;
-		      if (count == 1) {
-		    	  int i =1; 
-		    	  numOfProc = word1;
-		    	  while (word1 != 0) {
-		    		  Processor pr = new Processor(i);
-		    		  pq.insert(pr);
-		    		  i++;
-		    		  word1--;
-		    	  }
-		      }else if (count == 2) {
-		    	  continue;
-		      }else {
-		    	  String new_word  = input.next();
-		    	  int new_word1 = Integer.parseInt(new_word);
-		    	  Task T = new Task(word1, new_word1); //task
-		    	  temp = pq.getmax(); //processor
-		    	  if (temp!=null) {
-		    		  lon.insert(temp, T); //pairnaw san parametro to Processor temp kai to Task T  kai dhmiourgw syndesh anamesa tous
-		    		  //System.out.println(T.getTime());
-		    	  }else {
-			    	  while (lon.isEmpty() != true) {
-				    	  if (z==1) {
-				    		temp1 = lon.peek_task_item();
-				    		temp2 = lon.peek_item();
-				    		min = lon.get(); 
-				    		min1 = min.getActiveTime();
-				    	  }else {
-				    		 Task temp_task = lon.peek_task_item();
-				    		 Processor temp_proc = lon.peek_item();
-				    		 Processor new_min = lon.get();
-				    		 //System.out.println(new_min.getActiveTime());
-				    		 if (new_min.getActiveTime() < min1) {
-				    			 new_lon.insert(temp2, temp1);
-				    			 temp1 = temp_task;
-				    			 temp2 = temp_proc;
-				    			 min = new_min;
-				    			 min1 = new_min.getActiveTime();
-				    			 //System.out.println(min1);
-				    		 }else {
-				    			 new_lon.insert(temp_proc, temp_task);
-				    		 }
-				    		 
-				    	  }
-				    	  //System.out.println(min.getActiveTime());
-				    	  z++;
-			    	  }
-			    	  min.add(T);
-			    	  System.out.println(min.getActiveTime());
-			    	  if (new_lon.Size() < numOfProc) {
-			    		 new_lon.insert(temp2, temp1);  
-				    	  while (new_lon.isEmpty()!=true) {
-				    		  Task temp11 = new_lon.peek_task_item();
-					  		  Processor temp12 = new_lon.peek_item();
-					  		  new_lon.get();
-					  		  lon.insert(temp12,temp11);
-					  		  System.out.println(lon.peek_item().getActiveTime());
-			    		 //System.out.println(new_lon.Size());
-				    	  }
-//			    	  System.out.println(min.processedTasks.get());
-//			    	  System.out.println(min.processedTasks.get());
-			    	  System.out.println(min.getActiveTime());
-			    	  }
-//		    	  new_lon.insert(temp2, temp1);
-//		    	  }
-		     }
-		 }
-//		new_lon.insert(temp2, temp1);
-//	  	  //lon = new_lon;
-//	  	  while (new_lon.isEmpty()!=true) {
-//	  		  Task temp11 = new_lon.peek_task_item();
-//	  		  Processor temp12 = new_lon.peek_item();
-//	  		  new_lon.get();
-//	  		  lon.insert(temp12,temp11);
-//	  		  //System.out.println(lon);
-//	  	  }
+	public void run() {
+	for(int i =1;i<=pros;i++) {  //edo ftiaxno kai bazo tous Processors sthn MaxPQ
+		Processor p = new Processor(i);
+		pq.insert(p);
 	}
+	for(int i=0;i<x.size();i++) {  //edo ginetai h anauesh ton diergasion 
+		tempP = pq.getmax();
+		tempP.processedTasks.add(x.get(i));
+		pq.insert(tempP);
+		counter++;
 	}
+	check:  //o counter metra apo thn 3h grammh os to telos ki an den einai idios me ton ariumo ton diergasion emfanizei mhnuma gia error
+	{
+	if(counter!=tasks) {
+		System.out.println("error!\nThe number of Tasks that given doesnt match with number of Tasks i received");
+		break check;
+		}
+	
+	for(int i=1;i<= pros;i++) {
+		System.out.print("id " + pq.max().getId() + ", load=" + pq.max().getTimeP() + ": ");
+			for(int j=0;j<pq.max().processedTasks.size();j++) {
+				System.out.print(pq.max().processedTasks.get(j).getTime()+" ");
+			}
+			System.out.println();
+			if(Makespan< pq.max().getTimeP());
+			Makespan = pq.max().getTimeP();
+			pq.getmax();
+	}
+	
+	System.out.println("Makespan = " + Makespan);
+	}
+	counter=0;
+	
+}
+//	public void Sorting() {
+//		Sort z = new Sort(this.x);
+//	}
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		txtReader k = new txtReader(args[0]);
+		Greedy x = new Greedy(k.taskList,Integer.parseInt(k.lines.get(0)),Integer.parseInt(k.lines.get(1)));
+		x.run();	
+		System.out.println("\nSORTED\n");
+		//x.Sorting();
+		x.run();
+	}
+
 }
